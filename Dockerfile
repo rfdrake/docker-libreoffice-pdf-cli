@@ -1,21 +1,14 @@
-FROM debian:jessie
+FROM debian:stable-slim
 
 # Disable prompts on apt-get install
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install latest stable LibreOffice
 RUN apt-get update -qq \
-    && apt-get install -y -q libreoffice \
-    && apt-get remove -q -y libreoffice-gnome
-
-# Cleanup after apt-get commands
-RUN apt-get clean \
+    && apt-get install -y -q --no-install-recommends libreoffice \
+    && apt-get clean \
+    && useradd --create-home --shell /bin/bash converter \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archives/*.deb /var/cache/apt/*cache.bin
-
-# Create user 'converter'
-RUN useradd --create-home --shell /bin/bash converter \
-    # Give user right to run libreoffice binary
-    && chown converter:converter /usr/bin/libreoffice
 
 USER converter
 WORKDIR /home/converter
